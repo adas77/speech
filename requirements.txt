@@ -1,0 +1,25 @@
+# jupyter
+
+# notebook
+# Jupyter
+
+
+# Speech recognition
+gtts
+IPython
+librosa
+matplotlib
+numba
+numpy
+pandas
+playsound
+# PyAudio
+scikit-learn
+scipy
+seaborn
+selenium
+sklearn
+tensorflow
+tqdm
+
+#Flask server
