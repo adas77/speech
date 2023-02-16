@@ -1,10 +1,11 @@
 # Download lib
 `pip install -r requirements.txt`
+- Docker 
     - TODO => Docker (flask, uwsgi, npm)
 
 # Analiza audio
 Jupyter Notebook: `notebook.ipynb`
-Użyte metody - plik `audio.py`:
+- Użyte metody - plik `audio.py`:
     - DONE => klasa `Audio` analiza, wykrsy, itp, itd
     - DONE => dataset `data` mały przykładowy
     - DONE => klasa `SpeechToText` klasyfikuje nagranie (nazwa folderu to jedno słowo, czas uczenia u mnie ok 40s dwa wyrazy ok 4k plików audio ) na słowo (do lekkiej poprawy)
@@ -14,7 +15,7 @@ Użyte metody - plik `audio.py`:
 
 # Run Flask server
 `./run.sh`
-Port `7777`
+- Port `7777`
     - DONE => Dodawanie plików audio - folder `audio`
     - TODO => autoryzacja
     - TODO => CRUD (SQL_Alchemy) dla plików audio
@@ -23,7 +24,7 @@ Port `7777`
 # Run Frontend
 `cd frontend && npm run dev`
 Za pierwszym razem: `npm i`
-Port `5173`
+- Port `5173`
     - DONE => Dodawanie plików audio
     - DONE => Śledzenie stanu plików
     - TODO => Tailwind CSS
