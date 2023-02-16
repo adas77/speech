@@ -14,6 +14,10 @@ from numba import cuda, jit
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 
+OUTPUT_MODEL_FILE = 'trained.hdf5'
+OUTPUT_CLASSES_FILE = 'trined.txt'
+SAMPLE_RATE = 8000
+
 
 class Audio:
     def __init__(self, audio_file: str, figsize=(14, 5)):
@@ -47,21 +51,19 @@ class Audio:
         librosa.display.specshow(mfcc, sr=self.sr, x_axis='time')
         plt.show()
 
-    
+
 class SpeechToText():
-    def __init__(self, train_audio_path: str, output_model_file: str, sample_rate=8000, figsize=(14, 5)):
+    def __init__(self, train_audio_path: str, output_model_file: str, sample_rate=SAMPLE_RATE, figsize=(14, 5)):
         self.train_audio_path = train_audio_path
         self.figsize = figsize
         self.sample_rate = sample_rate
         self.output_model_file = output_model_file
 
-    @jit(target_backend='cuda')
+    # @jit(target_backend='cuda')
     def train(self):
-
         all_wave = []
         all_label = []
         labels = os.listdir(self.train_audio_path)
-        # labels = ["yes", "no"]
         for label in labels:
             print(label)
             waves = [f for f in os.listdir(
@@ -77,14 +79,23 @@ class SpeechToText():
         #
         le = LabelEncoder()
         y = le.fit_transform(all_label)
-        self.classes = list(le.classes_)
+        classes = list(le.classes_)
+
+        with open(OUTPUT_CLASSES_FILE, 'w') as fp:
+            fp.write('\n'.join(classes))
+            fp.write('\n')
+
         #
         y = np_utils.to_categorical(y, num_classes=len(labels))
+
         all_waves = np.array(all_wave).reshape(-1, self.sample_rate, 1)
+
         # split to  train and test
+
         TEST_SIZE = 0.2
         x_tr, x_val, y_tr, y_val = train_test_split(
             np.array(all_wave), np.array(y), stratify=y, test_size=TEST_SIZE, random_state=7)
+
         # conv layers
         K.clear_session()
         inputs = Input(shape=(self.sample_rate, 1))
@@ -126,14 +137,33 @@ class SpeechToText():
         es = EarlyStopping(monitor='val_loss', mode='min',
                            verbose=1, patience=10, min_delta=0.0001)
         mc = ModelCheckpoint(
-            'best_model.hdf5', monitor='val_acc', verbose=1, save_best_only=True, mode='max')
+            self.output_model_file, monitor='val_acc', verbose=1, save_best_only=True, mode='max')
         history = model.fit(x_tr, y_tr, epochs=100, callbacks=[
             es, mc], batch_size=32, validation_data=(x_val, y_val))
 
+        plt.figure(history, figsize=self.figsize)
+
         model.save(self.output_model_file)
 
-    def predict(self, audio) -> str:
-        model = load_model(self.output_model_file)
-        prob = model.predict(audio.reshape(1, self.sample_rate, 1))
+    @staticmethod
+    def predict(audio_path) -> str:
+        ss, sample_rate = librosa.load(audio_path, sr=16000)
+        ss = librosa.resample(ss, sample_rate, SAMPLE_RATE)
+        model = load_model(OUTPUT_MODEL_FILE)
+        try:
+            prob = model.predict(ss.reshape(1, SAMPLE_RATE, 1))
+        except:
+            return ()
+
         index = np.argmax(prob[0])
-        return self.classes[index]
+
+        print("Index    ")
+        print(index)
+
+        classes = []
+        with open(OUTPUT_CLASSES_FILE, 'r') as fp:
+            for line in fp:
+                x = line[:-1]
+                classes.append(x)
+
+        return classes[index], index

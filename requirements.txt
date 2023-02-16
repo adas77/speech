@@ -23,3 +23,6 @@ tensorflow
 tqdm
 
 #Flask server
+flask
+Flask
+python-dotenv
