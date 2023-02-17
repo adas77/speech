@@ -32,10 +32,11 @@ class Audio:
     def spectogram(self, log=False):
         X = librosa.stft(self.x)
         Xdb = librosa.amplitude_to_db(abs(X))
-        plt.title("ego0")
+        y = 'log' if log else 'hz'
         plt.figure(figsize=self.figsize)
+        plt.title(f'Spektogram, typ:{y}')
         librosa.display.specshow(
-            Xdb, sr=self.sr, x_axis='time', y_axis='log' if log else 'hz')
+            Xdb, sr=self.sr, x_axis='time', y_axis=y)
         plt.colorbar()
 
     def play(self):
@@ -45,8 +46,7 @@ class Audio:
         librosa.output.write_wav(filename, self.x, self.sr)
 
     def mfcc(self):
-        mfcc = librosa.feature.mfcc(x=self.x, sr=self.sr)
-        print(mfcc.shape)
+        mfcc = librosa.feature.mfcc(y=self.x, sr=self.sr)
         plt.figure(figsize=self.figsize)
         librosa.display.specshow(mfcc, sr=self.sr, x_axis='time')
         plt.show()
