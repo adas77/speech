@@ -5,11 +5,17 @@ import librosa
 import librosa.display
 import matplotlib.pyplot as plt
 import numpy as np
+import prosodic as p
+from essential_generators import DocumentGenerator
 from keras import backend as K
 from keras.callbacks import EarlyStopping, ModelCheckpoint
 from keras.layers import Conv1D, Dense, Dropout, Flatten, Input, MaxPooling1D
 from keras.models import Model, load_model
 from keras.utils import np_utils
+from nltk.corpus import stopwords
+from nltk.probability import FreqDist
+from nltk.stem import PorterStemmer
+from nltk.tokenize import word_tokenize
 from numba import cuda, jit
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
@@ -167,3 +173,55 @@ class SpeechToText():
                 classes.append(x)
 
         return classes[index], index
+
+
+class TextToSpeech():
+    # TODO FIXME TEST
+    def __init__(self):
+        self.text = TextToSpeech.__rand_sentence()
+
+    @staticmethod
+    def __rand_sentence():
+        gen = DocumentGenerator()
+        return gen
+
+    def example(self):
+        print(f'start_text:{self.text}')
+
+        # tokenize
+        word_tokenize()
+        tokenized = word_tokenize(self.text)
+        print(f'tokenized:{tokenized}')
+
+        # freq
+        freq = FreqDist(tokenized)
+        freq_ten = freq.most_common(10)
+        print(f'freq10:{freq_ten}')
+
+        # stemming
+        ps = PorterStemmer()
+        common = 'common_part'
+        s_dict = []
+        for i in range(33):
+            end = i*'a'
+            s_dict.append(common+end)
+
+        print(f'Dict{s_dict}')
+        for i in s_dict:
+            print(f'stemmed:{i}:{ps.stem(i)}')
+
+        # stop words
+        stopped = set(stopwords.words('polish'))
+        print(stopped)
+        lokomotywa = 'A jeszcze palacz węgiel w nią sypie.Wagony do niej podoczepialiWielkie i ciężkie, z żelaza, stali,I pełno ludzi w każdym wagonie,A wjednym krowy, a w drugim konie,A w trzecim siedzą same grubasy,Siedzą i jedzą tłuste kiełbasy,A czwarty wagon pełen bananów,A w piątym stoi sześć fortepianów,W szóstym armata - o! jaka wielka!'
+        lokomotywa = word_tokenize(lokomotywa.lower())
+        my_stopwords = [i for i in lokomotywa if i not in stopped]
+        print(f'Stopwords lokomotywa:{my_stopwords}')
+
+        # prosodic: text -> rhythm text
+        prosodic_sentence = 'Sometimes life hits you in the head with a brick. Do not lose faith.'
+        print(f'prosodic sentence:{prosodic_sentence}')
+        prosodic = p.Text(prosodic_sentence)
+        prosodic_parsed=prosodic.parse()
+        print(f'prosodic_parsed:{prosodic_parsed}')
+        

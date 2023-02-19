@@ -1,7 +1,9 @@
 # Download lib
-`pip install -r requirements.txt`
+Linux: `pip install -r requirements.txt`__
+Linux - upgrade libs: `pip install -U -r requirements.txt`__
+Windows: `py -m pip install -U -r requirements.txt`__
 - Docker 
-    - TODO => Docker (flask, uwsgi, npm)
+    - TODO => Docker (flask, uwsgi, npm | jupyter notebook)
 
 # Analiza audio
 Jupyter Notebook: `notebook.ipynb`
@@ -29,7 +31,13 @@ Za pierwszym razem: `npm i`
     - DONE => Śledzenie stanu plików
     - TODO => Tailwind CSS
 
+## Źródła
 # Optymalizacja przy użyciu GPU
-[Nvidia Cuda](https://developer.nvidia.com/cuda-downloads?target_os=Linux&target_arch=x86_64&Distribution=Ubuntu&target_version=22.04&target_type=deb_local)
-[how-to-resolve-unmet-dependencies-error-when-upgrading-depends-nvidia-kernel-c](https://askubuntu.com/questions/1436506/how-to-resolve-unmet-dependencies-error-when-upgrading-depends-nvidia-kernel-c)
-[python gpu](https://www.geeksforgeeks.org/running-python-script-on-gpu/)
+[Nvidia Cuda](https://developer.nvidia.com/cuda-downloads?target_os=Linux&target_arch=x86_64&Distribution=Ubuntu&target_version=22.04&target_type=deb_local)__
+[how-to-resolve-unmet-dependencies-error-when-upgrading-depends-nvidia-kernel-c](https://askubuntu.com/questions/1436506/how-to-resolve-unmet-dependencies-error-when-upgrading-depends-nvidia-kernel-c)__
+[python gpu](https://www.geeksforgeeks.org/running-python-script-on-gpu/)__
+# Przetwarzanei tekstu
+[Prosodic - A metrical-phonological parser](http://prosodic.stanford.edu/)__
+[prosodic - python lib](https://pypi.org/project/prosodic/)__
+
+[Natural Language Toolkit](https://www.nltk.org/)__

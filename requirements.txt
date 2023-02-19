@@ -5,14 +5,17 @@
 
 
 # Speech recognition
+essential-generators
 gtts
 IPython
 librosa
 matplotlib
 numba
 numpy
+nltk
 pandas
 playsound
+prosodic
 # PyAudio
 scikit-learn
 scipy
