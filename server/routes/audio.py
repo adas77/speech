@@ -1,5 +1,6 @@
 import os
 from flask import Blueprint, current_app, request
+from server.utils.audio import SpeechToText
 
 bp = Blueprint('audio', __name__)
 
@@ -17,3 +18,19 @@ def upload():
         return "FILES UPLOADED"
 
     return "TODO"
+
+
+@bp.route('/audio/<string:uuid>', methods=["GET"])
+def predict(uuid):
+    path = current_app.config['UPLOAD_DIR']+'/'+uuid+'.wav'
+    return SpeechToText.predict(path)
+
+
+@bp.route('/audio/<string:uuid>', methods=["DELETE"])
+def remove_audio(uuid):
+    path = current_app.config['UPLOAD_DIR']+'/'+uuid+'.wav'
+    if os.path.exists(path):
+        os.remove(path)
+        return f"File deleted:{path}"
+    else:
+        return "The file does not exist"
