@@ -8,7 +8,7 @@
 essential-generators
 gtts
 IPython
-librosa
+librosa==0.8.1
 matplotlib
 numba
 numpy
