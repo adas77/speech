@@ -28,7 +28,7 @@ SAMPLE_RATE = 8000
 
 nltk.download('punkt')
 nltk.download('stopwords')
-nltk.download('corpus')
+# nltk.download('corpus')
 
 
 class Audio:
@@ -173,8 +173,12 @@ class SpeechToText():
         ss = librosa.resample(ss, sample_rate, SAMPLE_RATE)
         model = load_model(OUTPUT_MODEL_FILE)
         try:
+            # FIXME:
+            ss = ss[0:SAMPLE_RATE]
+            print(ss)
             prob = model.predict(ss.reshape(1, SAMPLE_RATE, 1))
         except:
+            print('Could not predict')
             return ()
 
         index = np.argmax(prob[0])

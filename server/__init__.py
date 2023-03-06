@@ -1,5 +1,5 @@
 from flask import Flask
-
+from flask_cors import CORS
 # from flask_sqlalchemy import SQLAlchemy
 
 # db = SQLAlchemy()
@@ -18,7 +18,8 @@ def init_app():
     app = Flask(__name__, instance_relative_config=False)
 
     app.config.from_object('server.config.Config')
-
+    cors = CORS(app, resources={r"/audio/*": {"origins": "*"}})
+    
     # db.init_app(app)
     # with app.app_context():
 

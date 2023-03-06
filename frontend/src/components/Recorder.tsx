@@ -1,4 +1,4 @@
-import { RecorderControlsProps } from "./types/recorder";
+import { RecorderControlsProps } from "../types/recorder";
 
 const Recorder = ({ recorderState, handlers }: RecorderControlsProps) => {
     const { recordingMinutes, recordingSeconds, initRecording } = recorderState;

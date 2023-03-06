@@ -1,9 +1,5 @@
 # jupyter
 
-# notebook
-# Jupyter
-
-
 # Speech recognition
 essential-generators
 gtts
@@ -27,5 +23,6 @@ tqdm
 
 #Flask server
 flask
+flask_cors
 Flask
 python-dotenv

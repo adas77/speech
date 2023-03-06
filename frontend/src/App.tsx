@@ -1,6 +1,6 @@
 import useRecorder from './hooks/useRecorder';
-import Recorder from './Recorder';
-import Recordings from './Recordings';
+import Recorder from './components/Recorder';
+import Recordings from './components/Recordings';
 import { UseRecorder } from './types/recorder';
 
 function App() {

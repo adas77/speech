@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { v4 as uuidv4 } from 'uuid';
 import { saveRecording, startRecording } from "../handlers/recorder";
 import { AudioExtension, AudioTrack, Interval, MediaRecorderEvent, Recorder } from "../types/recorder";
+import { saveAudio } from "../api";
 
 
 const initialState: Recorder = {
@@ -19,26 +20,6 @@ export default function useRecorder() {
 
     const [recorderState, setRecorderState] = useState<Recorder>(initialState);
     const ext: AudioExtension = 'wav'
-
-    const handleSave = async (blob: Blob, key: string) => {
-        // https://stackoverflow.com/questions/72870388/send-blob-file-via-axios
-        // TODO: user ID, fix 2 rendering, 
-        let formData = new FormData();
-        let fileName = `${key}.${ext}`;
-        let file = new File([blob], fileName);
-        formData.append('file', file, fileName);
-        try {
-            const response = await axios.post(`${import.meta.env.VITE_API}/audio`,
-                formData, {
-                headers: {
-                    'Content-Type': `multipart/form-data`,
-                },
-            });
-            console.log(response);
-        } catch (err) {
-            console.log(err);
-        }
-    }
 
     useEffect(() => {
         const MAX_RECORDER_TIME = 5;
@@ -106,8 +87,7 @@ export default function useRecorder() {
 
 
                     if (prevState.mediaRecorder) {
-                        handleSave(blob, uuidv4())
-
+                        saveAudio(blob, uuidv4())
                         return {
                             ...initialState,
                             audio: window.URL.createObjectURL(blob),
