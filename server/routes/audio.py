@@ -1,7 +1,9 @@
 import codecs
 import os
-from flask import Blueprint, current_app, request, json, send_file, send_from_directory
-import requests
+
+from flask import (Blueprint, current_app, json, request, send_file,
+                   send_from_directory)
+
 from server.utils.audio import SpeechToText
 
 bp = Blueprint('audio', __name__)
@@ -25,7 +27,10 @@ def upload():
                              errors='ignore') as fdata:
                 audio_blob = fdata.read()
                 key = p.split('.')[0]
-                data.append({'key': key, 'audio': audio_blob})
+                word, index = SpeechToText.predict(f'{path}/{p}')
+
+                data.append(
+                    {'key': key, 'audio': audio_blob, 'predicted': word})
         response = current_app.response_class(
             response=json.dumps(data), status=200, mimetype='application/json'
         )
@@ -58,6 +63,9 @@ def remove_audio(uuid):
     path = current_app.config['UPLOAD_DIR']+'/'+uuid+'.wav'
     if os.path.exists(path):
         os.remove(path)
-        return f"File deleted:{path}"
+        response = current_app.response_class(
+            response=json.dumps({'uuid': uuid}), status=202, mimetype='application/json'
+        )
+        return response
     else:
         return "The file does not exist"

@@ -1,51 +1,53 @@
-import { useMutation, useQuery } from "react-query";
-import { deleteAudio, getAudios, predictAudio } from "../api";
-import { Audio, RecordingsListProps } from "../types/recorder";
-import { str_to_blob } from "../utils/audio";
-// import "../../../audio"
+import { useState } from "react"
+import { useMutation, useQuery } from "react-query"
+import { deleteAudio, getAudios } from "../api"
+import { Audio } from "../types/recorder"
+import Error from "./Error"
+import Spinner from "./Spinner"
 
-const Recordings = ({ audio }: RecordingsListProps) => {
-    const { isLoading, refetch, data: recordings } = useQuery({
-        queryKey: 'query-audio',
-        queryFn: getAudios
+const Recordings = () => {
+    const [audios, setAudios] = useState<Audio[]>([])
+    const { isLoading, isError, isRefetching } = useQuery("queryAudio", () =>
+        getAudios(), {
+        onSuccess(audios) {
+            setAudios(audios)
+        },
 
-        // onSuccess:async(recodings)=>{
-        //     QueryCache.setQueryData('forecast', recodings);
     })
-    const del = useMutation((uuid: string) => {
-        return deleteAudio(uuid)
-    })
-    // const delAudio=(uuid:string) => useQuery({
-    //     queryKey: 'delete-audio',
-    //     queryFn: deleteAudio
-    //     // onSuccess:async(recodings)=>{
-    //     //     QueryCache.setQueryData('forecast', recodings);
-    // })
-    // const { recordings, deleteAudio } = useRecordingsList(audio);
+
+    const { mutateAsync: del } = useMutation("deleteAudio", (uuid: string) =>
+        deleteAudio(uuid)
+        , {
+            onSuccess(data) {
+                setAudios(prev => prev.filter(a => a.key !== data?.data.uuid))
+            },
+        })
 
     return (
         <div >
-            {/* { recordings.length > 0 ? ( */}
-            {recordings ? (
+            {(isLoading || isRefetching) && <Spinner />}
+            {isError && <Error msg={"Error while fetching..."} />}
+            {audios ? (
                 <>
                     <h1>Your recordings</h1>
                     <div >
-                        {recordings.map((record: Audio) => (
+                        {audios.map((record: Audio) => (
                             <div key={record.key}>
-                                {/* <audio controls src={`${import.meta.env.VITE_API}/audio/${record.key}.wav`} /> */}
                                 <audio controls src={`${import.meta.env.VITE_API}/audio/${record.key}.wav`} />
                                 <div >
                                     <button
                                         title="Delete this audio"
-                                        onClick={() => del.mutate(record.key)}
+                                        onClick={() => del(record.key)}
                                     >
                                         del
                                     </button>
+                                    <br />
                                     <button
                                         title="Predict"
-                                        onClick={() => predictAudio(record.key)}
+                                        onClick={() => {
+                                        }}
                                     >
-                                        predict
+                                        Predicted: {record.predicted}
                                     </button>
                                 </div>
                             </div>
@@ -58,6 +60,6 @@ const Recordings = ({ audio }: RecordingsListProps) => {
                 </div>
             )}
         </div>
-    );
+    )
 }
 export default Recordings

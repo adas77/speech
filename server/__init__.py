@@ -19,7 +19,7 @@ def init_app():
 
     app.config.from_object('server.config.Config')
     cors = CORS(app, resources={r"/audio/*": {"origins": "*"}})
-    
+
     # db.init_app(app)
     # with app.app_context():
 
