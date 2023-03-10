@@ -54,6 +54,15 @@ class Audio:
             Xdb, sr=self.sr, x_axis='time', y_axis=y)
         plt.colorbar()
 
+    @staticmethod
+    def spectogram(signal, sr):
+        X = librosa.stft(signal)
+        Xdb = librosa.amplitude_to_db(abs(X))
+        plt.figure(figsize=(14, 5))
+        librosa.display.specshow(
+            Xdb, sr=sr, x_axis='time', y_axis='hz')
+        plt.colorbar()
+
     def play(self):
         ipd.Audio(self.audio_file)
 
@@ -170,13 +179,26 @@ class SpeechToText():
     @staticmethod
     def predict(audio_path) -> str:
         ss, sample_rate = librosa.load(audio_path, sr=16000)
-        ss = librosa.resample(ss, sample_rate, SAMPLE_RATE)
+        return SpeechToText._predict(ss, sample_rate)
+
+    # FIXME
+    @staticmethod
+    def predict_sentence(audio_path) -> str:
+        ss, sample_rate = librosa.load(audio_path, sr=16000)
+        res = librosa.effects.split(ss)
+        print(res)
+        classification, _ = SpeechToText._predict(ss, sample_rate)
+        return res
+
+    @staticmethod
+    def _predict(signal, sample_rate) -> str:
+        signal = librosa.resample(signal, sample_rate, SAMPLE_RATE)
         model = load_model(OUTPUT_MODEL_FILE)
         try:
             # FIXME:
-            ss = ss[0:SAMPLE_RATE]
-            print(ss)
-            prob = model.predict(ss.reshape(1, SAMPLE_RATE, 1))
+            signal = signal[0:SAMPLE_RATE]
+            print(signal)
+            prob = model.predict(signal.reshape(1, SAMPLE_RATE, 1))
         except:
             print('Could not predict')
             return ()

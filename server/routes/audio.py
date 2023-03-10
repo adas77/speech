@@ -47,6 +47,17 @@ def predict(uuid):
     )
     return response
 
+# FIXME
+@bp.route('/audio/predicts/<string:uuid>', methods=["GET"])
+def predicts(uuid):
+    print(f'audio: {uuid}')
+    path = current_app.config['UPLOAD_DIR']+'/'+uuid+'.wav'
+    res = SpeechToText.predict_sentence(path)
+    response = current_app.response_class(
+        response=json.dumps({'ndarray': res.tolist()}), status=200, mimetype='application/json'
+    )
+    return response
+
 
 @bp.route('/audio/<string:filename>', methods=["GET"])
 def get_f(filename):

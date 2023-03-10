@@ -1,12 +1,20 @@
 import axios from "axios"
 import { AudioExtension } from "./types/recorder"
+import { v4 as uuidv4 } from 'uuid'
+
 const ext: AudioExtension = 'wav'
 
-export const saveAudio = async (blob: Blob, uuid: string) => {
+
+export const saveAudio = async (file: File | Blob) => {
     let formData = new FormData()
+    let uuid = uuidv4()
     let fileName = `${uuid}.${ext}`
-    let file = new File([blob], fileName)
-    formData.append('file', file, fileName)
+    let file_
+    if (file instanceof Blob) {
+        file_ = new File([file], fileName)
+    }
+    else { file_ = file }
+    formData.append('file', file_, fileName)
     try {
         const response = await axios.post(`${import.meta.env.VITE_API}/audio`,
             formData, {
@@ -19,6 +27,7 @@ export const saveAudio = async (blob: Blob, uuid: string) => {
         console.log(err)
     }
 }
+
 
 export const deleteAudio = async (uuid: string) => {
     try {

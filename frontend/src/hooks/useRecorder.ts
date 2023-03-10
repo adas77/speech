@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react"
-import { v4 as uuidv4 } from 'uuid'
+import { useQueryClient } from "react-query"
 import { saveAudio } from "../api"
 import { saveRecording, startRecording } from "../handlers/recorder"
 import { AudioTrack, Interval, MediaRecorderEvent, Recorder } from "../types/recorder"
 import { AUDIO_EXT } from "../utils/consts"
-import { useQueryClient } from "react-query"
 
 
 const initialState: Recorder = {
@@ -82,7 +81,7 @@ export default function useRecorder() {
             recorder.onstop = () => {
                 const blob = new Blob(chunks, { type: `audio/${AUDIO_EXT}; codecs=opus` })
                 chunks = []
-                saveAudio(blob, uuidv4())
+                saveAudio(blob)
                 queryClient.fetchQuery("queryAudio")
 
                 setRecorderState((prevState: Recorder) => {
