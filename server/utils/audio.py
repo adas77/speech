@@ -11,6 +11,7 @@ from essential_generators import DocumentGenerator
 from keras import backend as K
 from keras.callbacks import EarlyStopping, ModelCheckpoint
 from keras.layers import Conv1D, Dense, Dropout, Flatten, Input, MaxPooling1D
+
 from keras.models import Model, load_model
 from keras.utils import np_utils
 from nltk.corpus import stopwords
@@ -20,6 +21,7 @@ from nltk.tokenize import word_tokenize
 from numba import cuda, jit
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
+from scipy.io.wavfile import write as write_wav
 
 OUTPUT_MODEL_FILE = 'trained.hdf5'
 OUTPUT_CLASSES_FILE = 'trined.txt'
@@ -28,7 +30,6 @@ SAMPLE_RATE = 8000
 
 nltk.download('punkt')
 nltk.download('stopwords')
-# nltk.download('corpus')
 
 
 class Audio:
@@ -215,6 +216,75 @@ class SpeechToText():
                 classes.append(x)
 
         return classes[index], index
+
+
+class Splitter():
+    # FIXME:
+    # https://stackoverflow.com/questions/36458214/split-speech-audio-file-on-words-in-python
+
+    @staticmethod
+    def split_in_parts(audio_path, out_dir, required_length_of_chunk_in_seconds=60, sample_rate=16000, min_length_for_silence=0.01, percentage_for_silence=0.01):
+        # Some constants
+        # min_length_for_silence -> seconds
+        # percentage_for_silence ->  # eps value for silence
+        # # Chunk will be around this value not exact
+        # required_length_of_chunk_in_seconds -> 1
+        # sample_rate   # Set to None to use default
+
+        # Load audio
+        waveform, sampling_rate = librosa.load(audio_path, sr=sample_rate)
+
+        # Create mask of silence
+        eps = waveform.max() * percentage_for_silence
+        silence_mask = (np.abs(waveform) < eps).astype(np.uint8)
+
+        # Find where silence start and end
+        runs = Splitter._zero_runs(silence_mask)
+        lengths = runs[:, 1] - runs[:, 0]
+
+        # Left only large silence ranges
+        min_length_for_silence = min_length_for_silence * sampling_rate
+        large_runs = runs[lengths > min_length_for_silence]
+        lengths = lengths[lengths > min_length_for_silence]
+
+        # Mark only center of silence
+        silence_mask[...] = 0
+        for start, end in large_runs:
+            center = (start + end) // 2
+            silence_mask[center] = 1
+
+        min_required_length = required_length_of_chunk_in_seconds * sampling_rate
+        chunks = []
+        prev_pos = 0
+        for i in range(min_required_length, len(waveform), min_required_length):
+            start = i
+            end = i + min_required_length
+            next_pos = start + silence_mask[start:end].argmax()
+            part = waveform[prev_pos:next_pos].copy()
+            prev_pos = next_pos
+            if len(part) > 0:
+                chunks.append(part)
+
+        # Add last part of waveform
+        part = waveform[prev_pos:].copy()
+        chunks.append(part)
+        print('Total chunks: {}'.format(len(chunks)))
+
+        new_files = []
+        for i, chunk in enumerate(chunks):
+            out_file = out_dir + "chunk_{}.wav".format(i)
+            print("exporting", out_file)
+            write_wav(out_file, sampling_rate, chunk)
+            new_files.append(out_file)
+
+        return new_files
+
+    @staticmethod
+    def _zero_runs(a):
+        iszero = np.concatenate(([0], np.equal(a, 0).view(np.int8), [0]))
+        absdiff = np.abs(np.diff(iszero))
+        ranges = np.where(absdiff == 1)[0].reshape(-1, 2)
+        return ranges
 
 
 class TextToSpeech():

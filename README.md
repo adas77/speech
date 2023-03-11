@@ -42,3 +42,6 @@ Za pierwszym razem: `npm i`
 [prosodic - python lib](https://pypi.org/project/prosodic/)
 
 [Natural Language Toolkit](https://www.nltk.org/)
+
+# Create Dataset (single words)
+`./create_dataset.sh`

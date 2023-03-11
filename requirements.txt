@@ -12,6 +12,7 @@ nltk
 pandas
 playsound
 prosodic
+pydub
 # PyAudio
 scikit-learn
 scipy
@@ -20,7 +21,6 @@ selenium
 sklearn
 tensorflow
 tqdm
-
 #Flask server
 flask
 flask_cors
