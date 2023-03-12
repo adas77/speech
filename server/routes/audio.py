@@ -48,6 +48,8 @@ def predict(uuid):
     return response
 
 # FIXME
+
+
 @bp.route('/audio/predicts/<string:uuid>', methods=["GET"])
 def predicts(uuid):
     print(f'audio: {uuid}')

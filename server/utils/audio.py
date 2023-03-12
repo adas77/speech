@@ -187,13 +187,22 @@ class SpeechToText():
     # FIXME
     @staticmethod
     def predict_sentence(audio_path) -> str:
+
+        # new_files = []
+        # for i, chunk in enumerate(chunks):
+        #     out_file = out_dir + "chunk_{}.wav".format(i)
+        #     print("exporting", out_file)
+        #     write_wav(out_file, sampling_rate, chunk)
+        #     new_files.append(out_file)
+
+        # ss, sample_rate = librosa.load(audio_path, sr=16000)
         splitter = Splitter()
-        splitter.split_in_parts()
-        ss, sample_rate = librosa.load(audio_path, sr=16000)
-        res = librosa.effects.split(ss)
-        print(res)
-        classification, _ = SpeechToText._predict(ss, sample_rate)
-        return res
+        chunks, sr = splitter.split_in_parts(audio_path, 1)
+        print('chunks:', len(chunks))
+        sentence = ' '.join(SpeechToText._predict(chunk, sr)[0]
+                            for chunk in chunks)
+        print('SENTENCE', sentence)
+        return sentence
 
     @staticmethod
     def _predict(signal, sample_rate) -> str:
@@ -206,7 +215,7 @@ class SpeechToText():
             prob = model.predict(signal.reshape(1, SAMPLE_RATE, 1))
         except:
             print('Could not predict')
-            return ()
+            return ('-', -1)
 
         index = np.argmax(prob[0])
 
@@ -227,7 +236,7 @@ class Splitter():
     # https://stackoverflow.com/questions/36458214/split-speech-audio-file-on-words-in-python
 
     @staticmethod
-    def split_in_parts(audio_path, out_dir, required_length_of_chunk_in_seconds=60, sample_rate=16000, min_length_for_silence=0.01, percentage_for_silence=0.01):
+    def split_in_parts(audio_path, required_length_of_chunk_in_seconds=60, sample_rate=16000, min_length_for_silence=0.01, percentage_for_silence=0.01):
         # Some constants
         # min_length_for_silence -> seconds
         # percentage_for_silence ->  # eps value for silence
@@ -274,14 +283,14 @@ class Splitter():
         chunks.append(part)
         print('Total chunks: {}'.format(len(chunks)))
 
-        new_files = []
-        for i, chunk in enumerate(chunks):
-            out_file = out_dir + "chunk_{}.wav".format(i)
-            print("exporting", out_file)
-            write_wav(out_file, sampling_rate, chunk)
-            new_files.append(out_file)
+        # new_files = []
+        # for i, chunk in enumerate(chunks):
+        #     out_file = out_dir + "chunk_{}.wav".format(i)
+        #     print("exporting", out_file)
+        #     write_wav(out_file, sampling_rate, chunk)
+        #     new_files.append(out_file)
 
-        return new_files
+        return chunks, sample_rate
 
     @staticmethod
     def _zero_runs(a):
