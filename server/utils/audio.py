@@ -90,6 +90,8 @@ class SpeechToText():
         all_label = []
         labels = os.listdir(self.train_audio_path)
         for label in labels:
+            if os.path.isfile(self.train_audio_path + '/' + label):
+                continue
             print(label)
             waves = [f for f in os.listdir(
                 self.train_audio_path + '/' + label) if f.endswith('.wav')]
@@ -185,6 +187,8 @@ class SpeechToText():
     # FIXME
     @staticmethod
     def predict_sentence(audio_path) -> str:
+        splitter = Splitter()
+        splitter.split_in_parts()
         ss, sample_rate = librosa.load(audio_path, sr=16000)
         res = librosa.effects.split(ss)
         print(res)
