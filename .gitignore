@@ -162,3 +162,5 @@ cython_debug/
 *.gz
 *.tar
 *.zip
+
+data/

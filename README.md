@@ -44,4 +44,4 @@ Za pierwszym razem: `npm i`
 [Natural Language Toolkit](https://www.nltk.org/)
 
 # Create Dataset (single words)
-`./create_dataset.sh`
+`./create_dataset.sh && python3 train_dataset.py`
